@@ -4,8 +4,9 @@ using namespace std;
 #include "HeadTable.h"
 #include "pardhp.h"
 
-HeadTable::HeadTable(double *d){
+HeadTable::HeadTable(const double *&d){
 	int count = 0;
+	int i;
 	for (i = 0; i < maxitem; i++){
 		if (d[i] >= MIN_UTILITY){
 			count++;
@@ -23,6 +24,18 @@ HeadTable::HeadTable(double *d){
 		}
 	}
 	
+}
+
+HeadTable::HeadTable(const double *&d,int c){
+	size = c;
+	HeadNode = (item_2 *)calloc(size, sizeof(item_2));
+	for (int i = 0; i < maxitem; i++){
+		if (d[i] >= MIN_UTILITY){
+			HeadNode[count].item2 = i;//设置其物品编号
+			HeadNode[count].t_utility = d[i];//设置其物品的TWU值
+			count++;
+		}
+	}
 }
 
 HeadTable::~HeadTable(){

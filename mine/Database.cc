@@ -70,7 +70,7 @@ void get_next_trans_ext(Dbase_Ctrl_Blk& DCB, int &numitem, int &tid)
    }   
 }
 
-int Database_readfrom(char *infile, itemset2 * &t_utilitycnt)
+int Database_readfrom(char *infile)
 {
    int i,j,k,m;
    
@@ -116,17 +116,10 @@ int Database_readfrom(char *infile, itemset2 * &t_utilitycnt)
    }
 
    printf("level 1 >MIN_UTILITY=%d, %f\n", count, total_tran_utility);//第一遍扫描数据库
+     
+//   reset_database(DCB);
+//   get_first_bl	k(DCB);
    
-   //TODO:建立HeadTable
-
-
-
-   //TODO:建立IHUP
-   reset_database(DCB);
-   get_first_blk(DCB);
-
-   
-
    printf("MIN_UTILITY=%f\n", MIN_UTILITY);
    return max_trans_sz;
 }

@@ -8,7 +8,8 @@ using namespace std;
 
 class HeadTable{
 public:
-	HeadTable(double *d);
+	HeadTable(const double *&d);
+	HeadTable(const double *&d, int c);
 	~HeadTable();
 
 	

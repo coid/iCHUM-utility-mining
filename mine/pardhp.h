@@ -8,20 +8,17 @@ extern "C" {
 #include <sys/types.h>
 
 extern double MIN_UTILITY;
-extern char transaction_file_name[100], profit_file_name[100];
-extern float *profit_array, *transaction_utility_array;
-extern int num_trans;
-extern int maxitem;
-extern int avg_trans_sz;
+extern char transaction_file_name[100], profit_file_name[100];//交易记录文件名，利润表文件名
+extern float *profit_array, *transaction_utility_array;//物品价值表，每条交易价值表
+extern int num_trans;//交易总数
+extern int maxitem;//物品总数
+extern int avg_trans_sz;//平均交易长度
 
-extern double *item_t_utility;
+extern double *item_t_utility;//物品的TWU值
 extern float MIN_UTILITY_PER;
 extern FILE *summary;
 extern int tot_cand;
-extern int max_pattern_length;
 
-extern int *hash_indx;
-extern struct timeval tp;
 #define seconds(tm) gettimeofday(&tp,(struct timezone *)0);\
    tm=tp.tv_sec+tp.tv_usec/1000000.0
       
@@ -29,11 +26,13 @@ extern struct timeval tp;
 
 #ifndef ITEM_RANK
 #define ITEM_RANK
+
 typedef struct item_rank_1{
+	bool isRoot;
 	double t_utility;
 	int item1;
 	item_1* parent;
-	item_1** children;
+	std::vector< item_1* > children;
 }item_1;//作为IHUP的节点
 
 typedef struct item_rank_2{

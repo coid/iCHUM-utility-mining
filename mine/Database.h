@@ -5,9 +5,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "ListItemset.h"
 #include "pardhp.h"
-#include "HashTree.h"
 using namespace std;
 #define ITSZ sizeof(int)
 
@@ -20,7 +18,7 @@ struct Dbase_Ctrl_Blk
    int cur_buf_pos;  
 };
 
-int Database_readfrom(char *,itemset2 *&);
+int Database_readfrom(char *);
 void reset_database(Dbase_Ctrl_Blk&);
 void get_next_trans_ext(Dbase_Ctrl_Blk& DCB, int &numitem, int &tid);
 void close_DCB(Dbase_Ctrl_Blk &DCB);
@@ -47,15 +45,6 @@ inline void get_next_trans(Dbase_Ctrl_Blk& DCB, int * &buf, int &numitem, int &t
    DCB.cur_buf_pos += numitem*2 + 2;
 }
 
-inline void make_Itemset(Itemset *it, int *buf, int numitem, int tid)
-{
-   int j, i;
-   
-   it->set_tid(tid);
-   it->set_numitems(numitem);
-   for (j=0, i=0; j < numitem; j++, i=i+2) {
-      it->add_item(j, buf[i]);
-   }
-}
+
 #endif //__DATABASE_H
 
