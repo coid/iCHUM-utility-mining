@@ -6,6 +6,7 @@ extern "C" {
 #include <time.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <vector>
 
 extern double MIN_UTILITY;
 extern char transaction_file_name[100], profit_file_name[100];//交易记录文件名，利润表文件名
