@@ -1,12 +1,14 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <stdlib.h>
 #include <vector>
+using namespace std;
 
 extern double MIN_UTILITY;
 extern char transaction_file_name[100], profit_file_name[100];//交易记录文件名，利润表文件名
@@ -32,23 +34,25 @@ typedef struct item_rank_1{
 	bool isRoot;
 	double t_utility;
 	int item1;
-	item_1* parent;
-	std::vector< item_1* > children;
+	item_rank_1* parent;
+	vector< item_rank_1* > children;
+        item_rank_1* brother;
 }item_1;//作为IHUP的节点
 
 typedef struct item_rank_2{
    double t_utility;
    int item2;
-   }item_2;//作为HeadTable的节点
+   item_rank_1 *linknode;
+}item_2;//作为HeadTable的节点
 
-typedef struct itemset_length_2 {
-   int count;
-   int size;
-   item_2 *t2;
-} itemset2;
+//typedef struct itemset_length_2 {
+//   int count;
+//   int size;
+//   item_2 *t2;
+//} itemset2;
 #endif
 
-#ifdef __cplusplus   
-   }
-#endif
+//#ifdef __cplusplus   
+//   }
+//#endif
 

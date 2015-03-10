@@ -10,15 +10,15 @@ using namespace std;
 class IHUP {
 public:
    
-   IHUP (HeadTable &ht);
+   IHUP (HeadTable& ht);
    ~IHUP();
 
-   void clear(item_1 root);
-   void insert(item_1 root, int tid, const int* item_list, const HeadTable &ht);
+   void clear(item_1* root);
+   void insert(item_1* root, int tid, const int* item_list, const HeadTable &ht);
    item_1* getRoot();
    
 private:
-	item_1 root;
+    item_1* root;
 
 };
 

@@ -8,18 +8,18 @@ using namespace std;
 
 class HeadTable{
 public:
-	HeadTable(const double *&d);
-	HeadTable(const double *&d, int c);
+	HeadTable(const double *d);
+	HeadTable(const double *d, int c);
 	~HeadTable();
 
 	
 	void TWU_sort();
 	void clear();
 	void merge(HeadTable ht);//TODO:合并两个HeadTable
-
-private:
-	int size;
-	item_2* HeadNode;
+        
+        item_2* HeadNode;
+        int size;
+	
 };
 
 #endif //__HEADTABLE_H

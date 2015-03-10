@@ -81,7 +81,7 @@ int Database_readfrom(char *infile)
    int transaction_file;
    double total_tran_utility = 0, tran_utility=0;
    transaction_file = open(infile,O_RDONLY);
-   int maxsize;
+   //int maxsize;
    read(transaction_file,buf,ITSZ);
    read(transaction_file,buf,ITSZ);
    read(transaction_file,buf,ITSZ);

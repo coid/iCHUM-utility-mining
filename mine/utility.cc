@@ -16,18 +16,15 @@
 #include <memory.h>
 #include <fcntl.h>
 using namespace std;
-#include "Itemset.h"
-#include "ListItemset.h"
-#include "HashTree.h"
 #include "Database.h"
+#include "HeadTable.h"
+#include "IHUP.h"
 #include "pardhp.h"
 
 #define MAXITER 30
 
 struct timeval tp;
 double MIN_UTILITY;
-int NUM_INSERT;
-int NUM_ACTUAL_INSERT;
 
 char transaction_file_name[100], profit_file_name[100];
 float *profit_array, *transaction_utility_array;
@@ -42,23 +39,23 @@ FILE *summary;
 
 double *item_t_utility;
 
-int more =1, threshold = 2, tot_cand =0, num_db_scan=2, max_pattern_length;
+//int more =1, threshold = 2, tot_cand =0, num_db_scan=2, max_pattern_length;
 
-int *item_index = NULL;
-int *item_rank_index = NULL;
+int *item_index = new int[maxitem];
+int *item_rank_index = new int[maxitem];
 
 int transaction_file;
 Dbase_Ctrl_Blk DCB;
-HeadTable ht;
-IHUP ihup;
+//HeadTable ht;
+//IHUP ihup;
 
 void form_index(const HeadTable &ht){
+    
+    for(int i =0 ;i<maxitem;i++){
+        item_index[i] = -1;
+    }
 
-	for (int i = 0; i < maxitem; i++){
-		item_index[i] = -1;
-	}
-
-	for (int i = 0; i < ht.size; i++){
+        for (int i = 0; i < ht.size; i++){
 		int indx = ht.HeadNode[i].item2;
 		item_index[indx] = i;
 	}
@@ -78,21 +75,21 @@ void main_proc(){
    int i, j, k, *buf, numitem, tid;
    
    Dbase_Ctrl_Blk DCB;
-   HeadTable ht;
+   
    
    max_trans_sz = Database_readfrom(transaction_file_name);  
    
-   ht = HeadTable(item_t_utility);
+   HeadTable ht = HeadTable(item_t_utility);
    ht.TWU_sort();//生成HeadTable，并排序
    form_index(ht);
    
    //第二遍去读数据库：先排序，再插入到IHUP中
    int blk = num_trans;
    int lb = 0;
-   int ub = num_trans;
+   int ub = blk;
    init_rank();
-   ihup = new IHUP(ht);
-   ihuproot = ihup.getRoot();
+   IHUP ihup = IHUP(ht);
+   item_1* ihuproot = ihup.getRoot();
 
    transaction_file = open(transaction_file_name, O_RDONLY);
    init_DCB(DCB, transaction_file);
@@ -102,12 +99,12 @@ void main_proc(){
 	   get_next_trans(DCB, buf, numitem, tid);
 	   for (j = 0; j < numitem * 2 - 1; j = j + 2){
 		   k = item_index[buf[j]];
-		   if (k != -1)//实现1：做一个大数组，如果一笔交易出现HeadTable内物品，记录之
+                   if (k != -1)//实现1：做一个大数组，如果一笔交易出现HeadTable内物品，记录之
 			   item_rank_index[k] = 1;
 	   }
 	   //TODO：插入IHUP树操作
 	   //插入操作;
-	   insert(ihuproot, tid, item_rank_index, ht);
+	   ihup.insert(ihuproot, tid, item_rank_index, ht);
 	   
 	   init_rank();
    }
@@ -121,7 +118,7 @@ int main(int argc, char **argv)
     int transaction_file, profit_file;
     summary = fopen("out", "a+");
     int indx, i, k, j, m, n, *buf, numitem, tid;
-    
+    double t1,t2,t3,t4;
     int total_real_high;
     
 
@@ -135,8 +132,8 @@ int main(int argc, char **argv)
     
      transaction_file = open(transaction_file_name, O_RDONLY);
 seconds(t1); 
-//phase I begin
-//建立HeadTable，IHUP，并挖掘
+//phase I begins
+//建立HeadTable，IHUP
      read(transaction_file, &num_trans, ITSZ);
      read(transaction_file, &maxitem, ITSZ);
      read(transaction_file, &avg_trans_sz, ITSZ);
@@ -150,18 +147,22 @@ seconds(t1);
      close(profit_file);
      MIN_UTILITY_PER = atof(argv[3]);
      
-	 item_index = new int[maxitem];
-	 item_rank_index = new int[maxitem];
+	 item_index = new int[maxitem];//记录物品在headtable中的标号
+	 item_rank_index = new int[maxitem];//记录物品是否在headtable中
      
      main_proc();//两次扫描数据库+构建IHUP树
-seconds(t2);     
-//phase II begin
-//进行验证工作
+seconds(t2);
+//phase I continues
+//进行挖掘算法,生成候选集
 
     
 seconds(t3);    
+//phase II begins
+//进行验证工作
+
+seconds(t4);
 //     fprintf(summary, "Cands %d ", tot_cand);
-printf("Final tot_cand=%d, total_real_high=%d, num_db_scan=%d\n", tot_cand, total_real_high, num_db_scan);
+//printf("Final tot_cand=%d, total_real_high=%d\n", tot_cand, total_real_high);
 printf("Phase I time=%f, total time = %f\n", t2-t1, t3-t1); 
 //     fprintf(summary, "Cands %d Total = %f ", tot_cand, te-ts);
      fprintf(summary, "\n");
@@ -169,13 +170,7 @@ printf("Phase I time=%f, total time = %f\n", t2-t1, t3-t1);
      fflush(summary);
      fflush(stdout);
      close_DCB(DCB);
-     delete Candidate;
-     if (Largelist) delete Largelist;
-        delete [] hash_indx;
-
-     delete [] start;
-     delete [] enda;
-     delete [] hash_pos;
+     
      return(0);
 }
 
