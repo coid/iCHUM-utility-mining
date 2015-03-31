@@ -89,7 +89,7 @@ int Database_readfrom(char *infile)
    item_t_utility = (double *)calloc(maxitem, sizeof(double));
    int blk = num_trans;
    int lb = 0; 
-   int ub = num_trans;
+   int ub = blk;
    init_DCB(DCB, transaction_file);
    reset_database(DCB);
    get_first_blk(DCB);

@@ -12,7 +12,7 @@ IHUP::IHUP(HeadTable &ht){
 //初始化root及其root的子节点
     root = new item_1;
     root->isRoot = true;
-    root->t_utility = -1;
+    root->t_utility = 0.0;
     root->item1 = -1;
     root->tf = -1;
     root->parent = NULL;
@@ -35,7 +35,7 @@ void IHUP::clear(item_1* root){
 	SAFE_DELETE(root);
 }
 
-void IHUP::insert(item_1* root, int tid,  int* item_list, const HeadTable &ht){
+void IHUP::insert(item_1* root, int &tid,  int* item_list, const HeadTable &ht){
 	for (int i = 0; i < ht.size; i++){
             //cout<<"root now"<<root->item1<<endl;
             if (item_list[i] == 1){

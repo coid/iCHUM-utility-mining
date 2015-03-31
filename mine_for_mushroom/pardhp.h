@@ -59,7 +59,7 @@ typedef struct item_rank_3{
 struct ct_node{
     double tu_per;
     vector<int> items;//对应的数目编号
-    ct_node* next;
+    //ct_node* next;
 };//条件树的节点
 
 struct ct_head{

@@ -14,7 +14,7 @@ public:
    ~IHUP();
 
    void clear(item_1* root);
-   void insert(item_1* root, int tid,  int* item_list, const HeadTable &ht);
+   void insert(item_1* root, int &tid,  int* item_list, const HeadTable &ht);
    item_1* getRoot();
      item_1* root;
 private:
