@@ -15,7 +15,6 @@
 #include <unistd.h>
 #include <memory.h>
 #include <fcntl.h>
-#include <list>
 using namespace std;
 #include "Database.h"
 #include "HeadTable.h"
@@ -115,11 +114,10 @@ void main_proc(HeadTable &ht, IHUP &ihup){
 	   //TODO：插入IHUP树操作
 	   //插入操作;
            ihup.insert(ihuproot, tid, item_rank_index, ht);
-           //cout<<"trans "<<tid<<" complete"<<endl;
            init_rank();
    }
    cout<<"complete"<<endl;
-   //cout<<"2-1 level num children :"<<ihup.getRoot()->children[0]->children.size()<<endl;
+   cout<<"2-1 level num children :"<<ihup.getRoot()->children[0]->children.size()<<endl;
 //   item_1* tmp = ht.HeadNode[3].linknode;
 //   while(tmp!=NULL){
 //       printf("no is %d twu per is %f\n",tmp->item1,tmp->t_utility);
@@ -134,7 +132,7 @@ void mine_proc(HeadTable &ht){
     int j = ht.size;
     cout<<"j is "<<j<<endl;
     int i;
-    for(i = j-1 ;i>=0;--i){
+    for(i = j-1 ;i>=0;i--){
         item_rank_1* cur = ht.HeadNode[i].linknode;
         if(cur == NULL){
             cout<<"oh, no"<<endl;
@@ -151,60 +149,43 @@ void mine_proc(HeadTable &ht){
         
         itemset* newitemset =new itemset;
         newitemset->count = ht.HeadNode[i].tf;
-        (newitemset->items).push_back(ht.HeadNode[i].item2);
+        newitemset->items.push_back(ht.HeadNode[i].item2);
         newitemset->twu = ht.HeadNode[i].t_utility;
         newitemset->utility = 0.0;
-        (newcand->itemslist).push_back(newitemset);
+        newcand->itemslist.push_back(newitemset);
         
- //       ct_head ct;//条件树vector
- //       ct.first = NULL;
+        ct_head ct;//条件树vector
+        ct.first = NULL;
         
-        list<ct_node*> ct;
         while(cur!=NULL){
-            item_rank_1* tmp = cur;
+            item_rank_1* tmp = cur; 
             ct_node* ctnode = new ct_node;
-            ctnode->tu_per = cur->t_utility;
-            //ctnode->next = NULL;
+            ct_node* ct_cur = ct.first;
+            
+            if(ct.first==NULL){
+                ctnode->tu_per = cur->t_utility;
+                ctnode->next = NULL;
+                ct.first = ctnode; 
+                ct_cur = ct.first;
+            }else{                
+                while(ct_cur->next!=NULL){
+                    ct_cur = ct_cur->next;
+                }
+                ctnode->tu_per = cur->t_utility;
+                ctnode->next = NULL;
+                ct_cur->next = ctnode;
+                ct_cur = ct_cur->next;
+            }
             
             while(!tmp->parent->isRoot){
                 int itemno = tmp->parent->item1 ;
                 tmp_twu[item_index[itemno]].twu += cur->t_utility;
-                (ctnode->items).push_back(itemno);
+                ctnode->items.push_back(itemno);
                 tmp = tmp->parent;               
             }
-            ct.push_back(ctnode);
+            
             cur = cur->brother;
-        }
-        
-//        while(cur!=NULL){
-//            item_rank_1* tmp = cur; 
-//            ct_node* ctnode = new ct_node;
-//            ct_node* ct_cur = ct.first;
-//            
-//            if(ct.first==NULL){
-//                ctnode->tu_per = cur->t_utility;
-//                ctnode->next = NULL;
-//                ct.first = ctnode; 
-//                ct_cur = ct.first;
-//            }else{                
-//                while(ct_cur->next!=NULL){
-//                    ct_cur = ct_cur->next;
-//                }
-//                ctnode->tu_per = cur->t_utility;
-//                ctnode->next = NULL;
-//                ct_cur->next = ctnode;
-//                ct_cur = ct_cur->next;
-//            }
-//            
-//            while(!tmp->parent->isRoot){
-//                int itemno = tmp->parent->item1 ;
-//                tmp_twu[item_index[itemno]].twu += cur->t_utility;
-//                ctnode->items.push_back(itemno);
-//                tmp = tmp->parent;               
-//            }
-//            
-//            cur = cur->brother;
-//        }//遍历条件树
+        }//遍历条件树
         
 //        printf("contitional tree completed\n");
 //        ct_node* tst = ct.first; 
@@ -215,17 +196,17 @@ void mine_proc(HeadTable &ht){
         
         bool goon = false;//记录是否还有潜在大的itemset
         int count =0;//记录新增加的有多少个
-        for(int k=i-1;k>=0;--k){
+        for(int k=i-1;k>=0;k--){
             if(tmp_twu[k].twu>=MIN_UTILITY){
                 goon = true;
                 count++;
                 itemset* newitemset =new itemset;
-                (newitemset->items).push_back(ht.HeadNode[i].item2);
+                newitemset->items.push_back(ht.HeadNode[i].item2);
                 newitemset->count = ht.HeadNode[k].tf;
-                (newitemset->items).push_back(ht.HeadNode[k].item2);
+                newitemset->items.push_back(ht.HeadNode[k].item2);
                 newitemset->twu =  tmp_twu[k].twu;
                 newitemset->utility = 0.0;
-                (newcand->itemslist).push_back(newitemset);               
+                newcand->itemslist.push_back(newitemset);               
             }
         }
         
@@ -234,7 +215,7 @@ void mine_proc(HeadTable &ht){
             int tmp_begin = newcand->itemslist.size();
             goon = false;
             count = 0;
-            for(int m = tmp_begin - tmp_count;m < tmp_begin; ++m ){
+            for(int m = tmp_begin - tmp_count;m < tmp_begin; m++ ){
                 init_tmp_twu(tmp_twu,i,ht);
                 //newcand->itemslist[m]->items[1],...size()-1
 //                for(int n =0; n < ct.size(); n++){
@@ -246,34 +227,35 @@ void mine_proc(HeadTable &ht){
 //                        }                            
 //                    }
 //                }//更新tmp_twu 
-                list<ct_node*>::iterator ctIterator;
-                for(ctIterator = ct.begin();ctIterator!=ct.end();ctIterator++){
-                    int t =1;
-                    for(int s=0;s<(*ctIterator)->items.size();++s){
-                        if(t<newcand->itemslist[m]->items.size() && (*ctIterator)->items[s] == newcand->itemslist[m]->items[t]) {
+                ct_node* ct_cur = ct.first;
+                while(ct_cur!=NULL){
+                    
+                    for(int s=0,t=1;s<ct_cur->items.size();s++){
+                        if(ct_cur->items[s] == newcand->itemslist[m]->items[t]) {
                             t = t+1;
                             continue;
                             }
                         if(t == newcand->itemslist[m]->items.size()) {
-                            tmp_twu[item_index[(*ctIterator)->items[s]]].twu += (*ctIterator)->tu_per;
+                            tmp_twu[item_index[ct_cur->items[s]]].twu += ct_cur->tu_per;
                         }
                     }        
+                    ct_cur = ct_cur->next;
                 }
                 
-                for(int k=i-1;k>=0;--k){
+                for(int k=i-1;k>=0;k--){
                     if(tmp_twu[k].twu >= MIN_UTILITY){
                     goon = true;
-                    ++count;
+                    count++;
                     itemset* newitemset =new itemset;
                     //int tmp_num = newcand->itemslist[m]->items.size()
-                    for(int l = 0;l < newcand->itemslist[m]->items.size();++l){
-                        (newitemset->items).push_back(newcand->itemslist[m]->items[l]);
+                    for(int l = 0;l < newcand->itemslist[m]->items.size();l++){
+                        newitemset->items.push_back(newcand->itemslist[m]->items[l]);
                     }
                     newitemset->count = ht.HeadNode[k].tf;                    
                     newitemset->twu =  tmp_twu[k].twu;
-                    (newitemset->items).push_back(ht.HeadNode[k].item2);
+                    newitemset->items.push_back(ht.HeadNode[k].item2);
                     newitemset->utility = 0.0;
-                    (newcand->itemslist).push_back(newitemset);               
+                    newcand->itemslist.push_back(newitemset);               
                     }
                 }//如果仍然有潜在的high组合,添加进newcand
                 
@@ -299,18 +281,6 @@ void mine_proc(HeadTable &ht){
         total_cand += cand[m]->itemslist.size();
     }
     printf("total cand is %d\n",total_cand);
-    
-    for(int m = 0;m<cand.size();m++){
-        if(cand[m]->item == 53){
-            for(int n=0;n<cand[m]->itemslist.size();n++){
-                for(int nn=0;nn<cand[m]->itemslist[n]->items.size();nn++){
-                fprintf(summary,"%d ",cand[m]->itemslist[n]->items[nn]);
-                }
-                fprintf(summary,"%f ",cand[m]->itemslist[n]->twu);
-                fprintf(summary,"%f\n",cand[m]->itemslist[n]->utility);
-            }
-        }
-    }
         
 }
 
@@ -403,7 +373,7 @@ void vertify_proc(HeadTable &ht){
 int main(int argc, char **argv)
 {
     int transaction_file, profit_file;
-    summary = fopen("out", "w");
+    summary = fopen("out", "a+");
     //int indx, i, k, j, m, n, *buf, numitem, tid;
     double t1,t2,t3,t4;
     //int total_real_high;

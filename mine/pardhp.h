@@ -12,7 +12,8 @@ using namespace std;
 
 extern double MIN_UTILITY;
 extern char transaction_file_name[100], profit_file_name[100];//交易记录文件名，利润表文件名
-extern float *profit_array, *transaction_utility_array;//物品价值表，每条交易价值表
+extern float *profit_array;
+extern double *transaction_utility_array;//物品价值表，每条交易价值表
 extern int num_trans;//交易总数
 extern int maxitem;//物品总数
 extern int avg_trans_sz;//平均交易长度
@@ -31,25 +32,54 @@ extern int tot_cand;
 #define ITEM_RANK
 
 typedef struct item_rank_1{
-	bool isRoot;
-	double t_utility;
-	int item1;
-	item_rank_1* parent;
-	vector< item_rank_1* > children;
-        item_rank_1* brother;
+	bool isRoot;//是否为根节点
+	double t_utility;//节点对应的twu值
+	int item1;//节点编号
+        int tf;//节点次数
+	item_rank_1* parent;//指向父节点
+	vector< item_rank_1* > children;//指向儿子节点
+        item_rank_1* brother;//下一个与它同编号的节点
 }item_1;//作为IHUP的节点
 
 typedef struct item_rank_2{
-   double t_utility;
-   int item2;
-   item_rank_1 *linknode;
+   double t_utility; //节点对应的twu值
+   int item2;//节点物品编号
+   int tf;//节点出现次数
+   item_rank_1 *linknode;//对应的树节点第一个位置
 }item_2;//作为HeadTable的节点
 
-//typedef struct itemset_length_2 {
-//   int count;
-//   int size;
-//   item_2 *t2;
-//} itemset2;
+typedef struct item_rank_3{
+    double twu;
+    int item;
+    
+}item_3;//条件树中用来快速实现记录
+
+
+
+struct ct_node{
+    double tu_per;
+    vector<int> items;//对应的数目编号
+    //ct_node* next;
+};//条件树的节点
+
+struct ct_head{
+    ct_node* first;
+    //ct_node* last;
+};//条件树头
+
+ struct itemset {
+   int count;//该itemset出现次数
+   vector<int> items;//对应的数目编号
+   double twu;//itemset的twu值
+   double utility;   //对应的真正的utility值
+} ;
+
+ struct candidate{
+    vector<itemset*> itemslist;//记录有希望的itemset
+    int item;//该栏必含的物品标号
+    //int count;//含有该物品的itemset的个数
+    //double twu;//该物品的twu值
+};
 #endif
 
 //#ifdef __cplusplus   

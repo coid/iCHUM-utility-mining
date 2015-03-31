@@ -72,14 +72,14 @@ void get_next_trans_ext(Dbase_Ctrl_Blk& DCB, int &numitem, int &tid)
 
 int Database_readfrom(char *infile)
 {
-   int i,j,k,m;
+   int i,j;
    
    int max_trans_sz = 1;
    int tid, numitem;
    Dbase_Ctrl_Blk DCB;
    int *buf;
    int transaction_file;
-   double total_tran_utility = 0, tran_utility=0;
+   double total_tran_utility = 0.0, tran_utility=0.0;
    transaction_file = open(infile,O_RDONLY);
    //int maxsize;
    read(transaction_file,buf,ITSZ);
@@ -88,8 +88,8 @@ int Database_readfrom(char *infile)
 
    item_t_utility = (double *)calloc(maxitem, sizeof(double));
    int blk = num_trans;
-   int lb = 0;
-   int ub = num_trans;
+   int lb = 0; 
+   int ub = blk;
    init_DCB(DCB, transaction_file);
    reset_database(DCB);
    get_first_blk(DCB);
@@ -115,7 +115,7 @@ int Database_readfrom(char *infile)
           count++;
    }
 
-   printf("level 1 >MIN_UTILITY=%d, %f\n", count, total_tran_utility);//第一遍扫描数据库
+   printf("level 1 >MIN_UTILITY=%d, %f\n", count, total_tran_utility);
      
 //   reset_database(DCB);
 //   get_first_bl	k(DCB);

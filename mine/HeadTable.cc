@@ -10,19 +10,21 @@ HeadTable::HeadTable(const double *d){
 	for (i = 0; i < maxitem; i++){
 		if (d[i] >= MIN_UTILITY){
 			count++;
+                        //cout<<"large item no is "<<i<<endl;
 		}
 	}
 	size = count;
 	
 	count = 0;
-	HeadNode = (item_2 *)calloc(size, sizeof(item_2));
+	HeadNode = new item_2[size];
 	for (i = 0; i<maxitem; i++) {
 		if (d[i] >= MIN_UTILITY){
-			HeadNode[count].item2 = i;//设置其物品编号
-			HeadNode[count].t_utility = d[i];//设置其物品的TWU值
-                        HeadNode[count].linknode = NULL;//设置指向IHUP节点的link
-			count++;
-		}
+                    HeadNode[count].item2 = i;//设置其物品编号
+                    HeadNode[count].t_utility = d[i];//设置其物品的TWU值
+                    HeadNode[count].tf =0;//设置初始的tf次数
+                    HeadNode[count].linknode = NULL;//设置指向IHUP节点的link
+                    count++;
+ 		}
 	}
 	
 }
