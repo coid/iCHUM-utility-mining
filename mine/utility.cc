@@ -300,17 +300,17 @@ void mine_proc(HeadTable &ht){
     }
     printf("total cand is %d\n",total_cand);
     
-    for(int m = 0;m<cand.size();m++){
-        if(cand[m]->item == 53){
-            for(int n=0;n<cand[m]->itemslist.size();n++){
-                for(int nn=0;nn<cand[m]->itemslist[n]->items.size();nn++){
-                fprintf(summary,"%d ",cand[m]->itemslist[n]->items[nn]);
-                }
-                fprintf(summary,"%f ",cand[m]->itemslist[n]->twu);
-                fprintf(summary,"%f\n",cand[m]->itemslist[n]->utility);
-            }
-        }
-    }
+//    for(int m = 0;m<cand.size();m++){
+//        if(cand[m]->item == 53){
+//            for(int n=0;n<cand[m]->itemslist.size();n++){
+//                for(int nn=0;nn<cand[m]->itemslist[n]->items.size();nn++){
+//                fprintf(summary,"%d ",cand[m]->itemslist[n]->items[nn]);
+//                }
+//                fprintf(summary,"%f ",cand[m]->itemslist[n]->twu);
+//                fprintf(summary,"%f\n",cand[m]->itemslist[n]->utility);
+//            }
+//        }
+//    }
         
 }
 
