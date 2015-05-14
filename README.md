@@ -1,4 +1,4 @@
-myprivate
-=========
+utility mining
 
-i
+
+this is for high utility mining in incremental databases.
