@@ -58,12 +58,30 @@ void form_index(const HeadTable &ht){
     for(int i =0 ;i<maxitem;i++){
         item_index[i] = -1;
     }
-
         for (int i = 0; i < maxitem; i++){
 		int indx = ht.HeadNode[i].item2;
 		item_index[indx] = i;
 	}
 
+}
+
+void form_index1(const HeadTable &ht){
+	for(int i =0 ;i<maxitem;i++){
+        item_index[i] = -1;
+    }
+	int j = 0;
+    for(int itmp=0;itmp<maxitem;itmp++){
+        if(ht.HeadNode[itmp].t_utility < MIN_UTILITY){
+            break;
+        }
+        j = itmp+1;
+    }
+
+        for (int i = 0; i < j; i++){
+		int indx = ht.HeadNode[i].item2;
+		item_index[indx] = i;
+	}
+	
 }
 
 void init_rank(){
@@ -343,11 +361,19 @@ void vertify_proc(HeadTable &ht,char* transaction_file_name){
 //   for(int tmp=0;tmp<maxitem;tmp++){
 //       printf("item_index %d is %d\n",tmp,item_index[tmp]);
 //   }
-   double * utility_per_item = (double *)calloc(maxitem, sizeof(double));
+int count = 0;
+    for(int itmp=0;itmp<maxitem;itmp++){
+        if(ht.HeadNode[itmp].t_utility < MIN_UTILITY){
+            break;
+        }
+        count = itmp+1;
+    }
+
+   double * utility_per_item = (double *)calloc(count, sizeof(double));
    for (i = lb; i < ub;i++){
 	   get_next_trans(DCB, buf, numitem, tid);
            
-           for(int tmp=0;tmp<maxitem;tmp++){utility_per_item[tmp] =0.0;}
+           for(int tmp=0;tmp<count;tmp++){utility_per_item[tmp] =0.0;}
            for (j = 0; j < numitem * 2 - 1; j = j + 2){
 		   if(item_index[buf[j]] != -1){
                        utility_per_item[item_index[buf[j]]] = buf[j+1] * profit_array[buf[j]];
@@ -676,17 +702,18 @@ seconds(t2);
 //phase I continues
 //进行挖掘算法,生成候选集
     
-   // mine_proc(ht);
+    mine_proc(ht);
     
 seconds(t3);    
 //phase II begins
 //进行验证工作
-
-   // vertify_proc(ht,transaction_file_name1);
+form_index1(ht);
+    vertify_proc(ht,transaction_file_name1);
     
 
 seconds(t4);
 //开始挖掘新的数据库
+cand.clear();
 printf("old transactions  is %d \n",num_trans);
 
 int offset = num_trans;
@@ -724,6 +751,7 @@ cout<<"mine ends"<<endl;
 
 seconds(t6);
 cout<<"vertify begins"<<endl;
+form_index1(ht);
 vertify_proc(ht,transaction_file_name0);
 cout<<"vertify finished"<<endl;
 seconds(t7);
