@@ -310,17 +310,17 @@ void mine_proc(HeadTable &ht){
     }
     printf( "total cand is %d\n",total_cand);
     
-    for(int m = 0;m<cand.size();m++){
-        
-            for(int n=0;n<cand[m]->itemslist.size();n++){
-                for(int nn=0;nn<cand[m]->itemslist[n]->items.size();nn++){
-                printf("%d ",cand[m]->itemslist[n]->items[nn]);
-                }
-                printf("%f ",cand[m]->itemslist[n]->twu);
-                printf("%f\n",cand[m]->itemslist[n]->utility);
-            }
-        
-    }
+//    for(int m = 0;m<cand.size();m++){
+//        
+//            for(int n=0;n<cand[m]->itemslist.size();n++){
+//                for(int nn=0;nn<cand[m]->itemslist[n]->items.size();nn++){
+//                printf("%d ",cand[m]->itemslist[n]->items[nn]);
+//                }
+//                printf("%f ",cand[m]->itemslist[n]->twu);
+//                printf("%f\n",cand[m]->itemslist[n]->utility);
+//            }
+//        
+//    }
         
 }
 
@@ -412,12 +412,12 @@ void vertify_proc(HeadTable &ht,char* transaction_file_name){
    printf("real high no is %d\n",real_high);
 }
 
-void update_proc(HeadTable &ht,int size){
+void update_proc(HeadTable &ht){
     bool exchange = false;
-    cout<<"new size is "<<size<<endl;
+    cout<<"new size is "<<ht.size<<endl;
     do{
     exchange = false;
-    for(int i = size-1;i>0;i--){
+    for(int i = ht.size-1;i>0;i--){
         int j = i-1;
         if(item_t_utility[ht.HeadNode[i].item2] <= item_t_utility[ht.HeadNode[j].item2]){
             continue;
@@ -426,7 +426,7 @@ void update_proc(HeadTable &ht,int size){
         //swap headnode
                 
         ht.swap_ht(i,j);
-        cout<<i<<" and "<<j<<" exchanged"<<endl;
+       // cout<<i<<" and "<<j<<" exchanged"<<endl;
         
         //swap all node in the tree
         item_rank_1* cur = ht.HeadNode[j].linknode;
@@ -700,10 +700,10 @@ seconds(t1);
     printf("ok", "\n");
     HeadTable ht = HeadTable(item_t_utility); 
     ht.TWU_sort();//生成HeadTable，并排序
-    for(int i =0;i<ht.size;i++){
-        printf("ht %d is %d , which %f\n",i,ht.HeadNode[i].item2,ht.HeadNode[i].t_utility);
-       //cout<<"ht no "<<i <<"is "<<ht.HeadNode[i].item2<<",which "<<ht.HeadNode[i].t_utility<<endl;
-    }
+//    for(int i =0;i<ht.size;i++){
+//        printf("ht %d is %d , which %f\n",i,ht.HeadNode[i].item2,ht.HeadNode[i].t_utility);
+//       //cout<<"ht no "<<i <<"is "<<ht.HeadNode[i].item2<<",which "<<ht.HeadNode[i].t_utility<<endl;
+//    }
     form_index(ht);
     
     IHUP ihup= IHUP(ht);
@@ -713,17 +713,18 @@ seconds(t2);
 //phase I continues
 //进行挖掘算法,生成候选集
     
-  // mine_proc(ht);
+   mine_proc(ht);
     
 seconds(t3);    
 //phase II begins
 //进行验证工作
 
-   // vertify_proc(ht,transaction_file_name1);
+    vertify_proc(ht,transaction_file_name1);
     
 
 seconds(t4);
 //开始挖掘新的数据库
+cand.clear();
 printf("old transactions  is %d \n",num_trans);
 
 int offset = num_trans;
@@ -755,6 +756,7 @@ vector< int >::iterator rescanIterator ;
     for(int i = ht.size -1 ; i > -1; --i){
         if(item_t_utility[ht.HeadNode[i].item2] < MIN_UTILITY){
             delete_nodes.push_back(ht.HeadNode[i].item2); 
+            continue;
         }
         rescanIterator = rescan_nodes.begin();
         while( rescanIterator != rescan_nodes.end() ){
@@ -785,22 +787,24 @@ if(rescan_nodes.size() > 0){
 //更新headtable
 if(rescan_nodes.size() > 0){
 cout<<"preprocess begins"<<endl;
+cout<<"change num is "<<rescan_nodes.size() <<endl;
 preprocess(ht,ihup,transaction_file_name1,offset,rescan_nodes.size());
 cout<<"preprocess ends"<<endl;
 }
+cout<<"new headtable is "<<ht.size<<endl;
 
 for(int i =0;i<ht.size;i++){
     ht.HeadNode[i].t_utility = item_t_utility[ht.HeadNode[i].item2];
 }
 cout<<"update begins"<<endl;
-update_proc(ht,ht.size-newhtsize);
+update_proc(ht);//,ht.size-newhtsize
 
 cout<<"update finished"<<endl;
 form_index(ht);
-for(int i =0;i<ht.size;i++){
-    printf("ht %d is %d , which %f\n",i,ht.HeadNode[i].item2,ht.HeadNode[i].t_utility);
-       //cout<<"ht no "<<i <<"is "<<ht.HeadNode[i].item2<<",which "<<ht.HeadNode[i].t_utility<<endl;
-}
+//for(int i =0;i<ht.size;i++){
+//    printf("ht %d is %d , which %f\n",i,ht.HeadNode[i].item2,ht.HeadNode[i].t_utility);
+//       //cout<<"ht no "<<i <<"is "<<ht.HeadNode[i].item2<<",which "<<ht.HeadNode[i].t_utility<<endl;
+//}
 
 main_proc(ht,ihup,transaction_file_name2,offset);
 seconds(t5);
